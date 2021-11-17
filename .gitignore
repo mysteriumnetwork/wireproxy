@@ -16,3 +16,6 @@
 bin/
 *.snap
 passwd.txt
+*.conf
+*.cnf
+*.ipc
