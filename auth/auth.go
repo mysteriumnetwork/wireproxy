@@ -73,7 +73,7 @@ func requireBasicAuth(wr http.ResponseWriter, req *http.Request, hidden_domain s
 			subtle.ConstantTimeCompare([]byte(req.Host), []byte(hidden_domain)) != 1) {
 		http.Error(wr, BAD_REQ_MSG, http.StatusBadRequest)
 	} else {
-		wr.Header().Set("Proxy-Authenticate", `Basic realm="dumbproxy"`)
+		wr.Header().Set("Proxy-Authenticate", `Basic realm="wireproxy"`)
 		wr.Header().Set("Content-Length", strconv.Itoa(len([]byte(AUTH_REQUIRED_MSG))))
 		wr.WriteHeader(407)
 		wr.Write([]byte(AUTH_REQUIRED_MSG))
