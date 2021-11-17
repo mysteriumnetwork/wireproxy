@@ -13,6 +13,8 @@ import (
 	"github.com/mysteriumnetwork/wireproxy/logger"
 )
 
+type ContextDialer func (context.Context, string, string) (net.Conn, error)
+
 type ProxyHandler struct {
 	timeout       time.Duration
 	auth          auth.Auth
@@ -20,23 +22,26 @@ type ProxyHandler struct {
 	httptransport http.RoundTripper
 	outbound      map[string]string
 	outboundMux   sync.RWMutex
+	dialer        ContextDialer
 }
 
-func NewProxyHandler(timeout time.Duration, auth auth.Auth, logger *logger.CondLogger) *ProxyHandler {
-	httptransport := &http.Transport{}
+func NewProxyHandler(timeout time.Duration, auth auth.Auth, dialer ContextDialer, logger *logger.CondLogger) *ProxyHandler {
+	httptransport := &http.Transport{
+		DialContext: dialer,
+	}
 	return &ProxyHandler{
 		timeout:       timeout,
 		auth:          auth,
 		logger:        logger,
 		httptransport: httptransport,
 		outbound:      make(map[string]string),
+		dialer:        dialer,
 	}
 }
 
 func (s *ProxyHandler) HandleTunnel(wr http.ResponseWriter, req *http.Request) {
 	ctx, _ := context.WithTimeout(req.Context(), s.timeout)
-	dialer := net.Dialer{}
-	conn, err := dialer.DialContext(ctx, "tcp", req.RequestURI)
+	conn, err := s.dialer(ctx, "tcp", req.RequestURI)
 	if err != nil {
 		s.logger.Error("Can't satisfy CONNECT request: %v", err)
 		http.Error(wr, "Can't satisfy CONNECT request", http.StatusBadGateway)

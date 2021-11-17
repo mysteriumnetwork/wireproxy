@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"time"
@@ -101,7 +102,7 @@ func run() int {
 
 	server := http.Server{
 		Addr:              args.bind_address,
-		Handler:           proxy.NewProxyHandler(args.timeout, auth, proxyLogger),
+		Handler:           proxy.NewProxyHandler(args.timeout, auth, new(net.Dialer).DialContext, proxyLogger),
 		ErrorLog:          log.New(logWriter, "HTTPSRV : ", log.LstdFlags|log.Lshortfile),
 		ReadTimeout:       0,
 		ReadHeaderTimeout: 0,
