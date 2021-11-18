@@ -21,7 +21,7 @@ make install
 
 ## Usage
 
-Put wireguard config in portable format into some file:
+Put wireguard config in [portable format](https://www.wireguard.com/xplatform/#configuration-protocol) into some file:
 
 ```
 private_key=a040e64ba968053326b6c27a156c7babf55cc05c43e4d88b47dd494cccc52540
