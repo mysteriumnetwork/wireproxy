@@ -54,6 +54,7 @@ Authentication parameters are passed as URI via `-auth` parameter. Scheme of URI
 
 ```
 $ ~/go/bin/wireproxy -h
+Usage of /home/user/go/bin/wireproxy:
   -auth string
     	auth parameters (default "none://")
   -bind-address string
@@ -66,14 +67,22 @@ $ ~/go/bin/wireproxy -h
     	colon-separated list of enabled ciphers
   -disable-http2
     	disable HTTP2
+  -dns-servers string
+    	comma-separated list of DNS server addresses (default "1.1.1.1,1.0.0.1")
   -key string
     	key for TLS certificate
   -list-ciphers
     	list ciphersuites
+  -mtu int
+    	MTU value (default 1420)
   -timeout duration
     	timeout for network operations (default 10s)
+  -tun-addr string
+    	comma-separated list of local Wireguard tunnel addresses
   -verbosity int
     	logging verbosity (10 - debug, 20 - info, 30 - warning, 40 - error, 50 - critical) (default 20)
   -version
     	show program version and exit
+  -wgconf string
+    	wg config in portable format (https://www.wireguard.com/xplatform/#configuration-protocol)
 ```
