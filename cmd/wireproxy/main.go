@@ -14,13 +14,10 @@ import (
 	"os"
 	"time"
 
-	wgconn "golang.zx2c4.com/wireguard/conn"
-	wgdev "golang.zx2c4.com/wireguard/device"
-	wgstack "golang.zx2c4.com/wireguard/tun/netstack"
-
 	"github.com/mysteriumnetwork/wireproxy/auth"
 	"github.com/mysteriumnetwork/wireproxy/logger"
 	"github.com/mysteriumnetwork/wireproxy/proxy"
+	"github.com/mysteriumnetwork/wireproxy/wgstack"
 )
 
 var (
@@ -80,7 +77,7 @@ func parse_args() CLIArgs {
 		"comma-separated list of DNS server addresses")
 	flag.StringVar(&args.localTunAddr, "tun-addr", "",
 		"comma-separated list of local Wireguard tunnel addresses")
-	flag.IntVar(&args.mtu, "mtu", wgdev.DefaultMTU, "MTU value")
+	flag.IntVar(&args.mtu, "mtu", wgstack.DefaultMTU, "MTU value")
 	flag.BoolVar(&args.showVersion, "version", false, "show program version and exit")
 	flag.Parse()
 	return args
@@ -112,11 +109,12 @@ func run() int {
 		log.LstdFlags|log.Lshortfile),
 		args.verbosity)
 	
-	dialer, err := makeDialer(&args, wgLogger)
+	wgst, err := makeWGStack(&args, wgLogger)
 	if err != nil {
 		mainLogger.Critical("Failed to construct wireguard connection: %v", err)
 		return 4
 	}
+	defer wgst.Close()
 
 	auth, err := auth.NewAuth(args.auth)
 	if err != nil {
@@ -126,7 +124,7 @@ func run() int {
 
 	server := http.Server{
 		Addr:              args.bind_address,
-		Handler:           proxy.NewProxyHandler(args.timeout, auth, dialer, proxyLogger),
+		Handler:           proxy.NewProxyHandler(args.timeout, auth, wgst.DialContext, proxyLogger),
 		ErrorLog:          log.New(logWriter, "HTTPSRV : ", log.LstdFlags|log.Lshortfile),
 		ReadTimeout:       0,
 		ReadHeaderTimeout: 0,
@@ -220,7 +218,7 @@ func parseIPList(list string) ([]net.IP, error) {
 	return res, nil
 }
 
-func makeDialer(args *CLIArgs, logger *logger.CondLogger) (proxy.ContextDialer, error) {
+func makeWGStack(args *CLIArgs, logger *logger.CondLogger) (*wgstack.WGStack, error) {
 	localAddresses, err := parseIPList(args.localTunAddr)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse local addresses list: %w", err)
@@ -231,34 +229,21 @@ func makeDialer(args *CLIArgs, logger *logger.CondLogger) (proxy.ContextDialer, 
 		return nil, fmt.Errorf("unable to parse DNS servers list: %w", err)
 	}
 
-	tun, tnet, err := wgstack.CreateNetTUN(
-		localAddresses,
-		dnsIPs,
-		args.mtu)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create virtual netdev: %w", err)
-	}
-
-	dev := wgdev.NewDevice(tun, wgconn.NewDefaultBind(), &wgdev.Logger{
-		func (fmt string, args ...interface{}) {
-			logger.Info(fmt, args...)
-		},
-		func (fmt string, args ...interface{}) {
-			logger.Error(fmt, args...)
-		},
-	})
-
 	confText, err := ioutil.ReadFile(args.wgConf)
 	if err != nil {
 		return nil, fmt.Errorf("unable to read wg config file: %w", err)
 	}
 
-	err = dev.IpcSet(string(confText))
-	if err != nil {
-		return nil, fmt.Errorf("config setting failed: %w", err)
-	}
-
-	dev.Up()
-
-	return tnet.DialContext, nil
+	return wgstack.NewWGStack(&wgstack.WGStackConfig{
+		LocalAddresses: localAddresses,
+		DNSServers: dnsIPs,
+		InitCommands: string(confText),
+		MTU: args.mtu,
+		Logger: func (fmt string, args ...interface{}) {
+			logger.Info(fmt, args...)
+		},
+		ErrorLogger: func (fmt string, args ...interface{}) {
+			logger.Error(fmt, args...)
+		},
+	})
 }
