@@ -19,27 +19,21 @@ Alternatively, you may install wireproxy from source. Run within source director
 make install
 ```
 
-#### Docker
-
-Docker image is available as well. Here is an example for running proxy as a background service:
-
-```sh
-docker run -d \
-    --security-opt no-new-privileges \
-    -p 8080:8080 \
-    --restart unless-stopped \
-    --name wireproxy \
-    mysteriumnetwork/wireproxy
-```
-
 ## Usage
 
-Just run program and it'll start accepting connections on port 8080 (default).
+Put wireguard config in portable format into some file:
 
-Example: run proxy on port 1234 with `Basic` authentication with username `admin` and password `123456`:
+```
+private_key=a040e64ba968053326b6c27a156c7babf55cc05c43e4d88b47dd494cccc52540
+public_key=c68ef6b420ef0838ccc4d649e1bb8058e95f848d0be1f3c8c6172fa59c1cfe1b
+endpoint=157.90.228.151:26611
+allowed_ip=0.0.0.0/0
+```
 
-```sh
-wireproxy -bind-address :1234 -auth 'static://?username=admin&password=123456'
+Run application:
+
+```
+wireproxy -tun-addr 172.21.123.4 -wgconf p.conf
 ```
 
 ## Authentication
