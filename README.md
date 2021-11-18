@@ -3,7 +3,7 @@ wireproxy
 
 PoC: Wireguard + gVisor userspace network stack + HTTP proxy = :heart:
 
-Implements HTTP proxy which forwards traffic through wireguard tunnel connection without creating any actual tunnel in the operating system or adjusting network routing in any way.
+Implements HTTP proxy which forwards traffic through wireguard tunnel connection without creating any actual tunnel in the operating system or adjusting network routing in any way. As result, it doesn't requires any elevated user priviliges, special network capabilities or platform-specific APIs to create virtual network device.
 
 Built on top of [dumbproxy](https://github.com/Snawoot/dumbproxy).
 
