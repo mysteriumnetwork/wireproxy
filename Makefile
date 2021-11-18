@@ -17,8 +17,6 @@ native: bin-native
 all: bin-linux-amd64 bin-linux-386 bin-linux-arm bin-linux-arm64 \
 	bin-linux-mips bin-linux-mipsle bin-linux-mips64 bin-linux-mips64le \
 	bin-freebsd-amd64 bin-freebsd-386 bin-freebsd-arm bin-freebsd-arm64 \
-	bin-netbsd-amd64 bin-netbsd-386 bin-netbsd-arm bin-netbsd-arm64 \
-	bin-openbsd-amd64 bin-openbsd-386 bin-openbsd-arm bin-openbsd-arm64 \
 	bin-darwin-amd64 bin-darwin-arm64 \
 	bin-windows-amd64 bin-windows-386 bin-windows-arm
 
@@ -38,14 +36,6 @@ bin-freebsd-amd64: $(OUTSUFFIX).freebsd-amd64
 bin-freebsd-386: $(OUTSUFFIX).freebsd-386
 bin-freebsd-arm: $(OUTSUFFIX).freebsd-arm
 bin-freebsd-arm64: $(OUTSUFFIX).freebsd-arm64
-bin-netbsd-amd64: $(OUTSUFFIX).netbsd-amd64
-bin-netbsd-386: $(OUTSUFFIX).netbsd-386
-bin-netbsd-arm: $(OUTSUFFIX).netbsd-arm
-bin-netbsd-arm64: $(OUTSUFFIX).netbsd-arm64
-bin-openbsd-amd64: $(OUTSUFFIX).openbsd-amd64
-bin-openbsd-386: $(OUTSUFFIX).openbsd-386
-bin-openbsd-arm: $(OUTSUFFIX).openbsd-arm
-bin-openbsd-arm64: $(OUTSUFFIX).openbsd-arm64
 bin-darwin-amd64: $(OUTSUFFIX).darwin-amd64
 bin-darwin-arm64: $(OUTSUFFIX).darwin-arm64
 bin-windows-amd64: $(OUTSUFFIX).windows-amd64.exe
@@ -92,30 +82,6 @@ $(OUTSUFFIX).freebsd-arm: $(src)
 
 $(OUTSUFFIX).freebsd-arm64: $(src)
 	CGO_ENABLED=0 GOOS=freebsd GOARCH=arm64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).netbsd-amd64: $(src)
-	CGO_ENABLED=0 GOOS=netbsd GOARCH=amd64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).netbsd-386: $(src)
-	CGO_ENABLED=0 GOOS=netbsd GOARCH=386 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).netbsd-arm: $(src)
-	CGO_ENABLED=0 GOOS=netbsd GOARCH=arm $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).netbsd-arm64: $(src)
-	CGO_ENABLED=0 GOOS=netbsd GOARCH=arm64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).openbsd-amd64: $(src)
-	CGO_ENABLED=0 GOOS=openbsd GOARCH=amd64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).openbsd-386: $(src)
-	CGO_ENABLED=0 GOOS=openbsd GOARCH=386 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).openbsd-arm: $(src)
-	CGO_ENABLED=0 GOOS=openbsd GOARCH=arm $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
-
-$(OUTSUFFIX).openbsd-arm64: $(src)
-	CGO_ENABLED=0 GOOS=openbsd GOARCH=arm64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
 
 $(OUTSUFFIX).darwin-amd64: $(src)
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build $(BUILDOPTS) $(LDFLAGS) -o $@ $(MAIN_PACKAGE)
@@ -171,10 +137,6 @@ install:
 	bin-netbsd-386 \
 	bin-netbsd-arm \
 	bin-netbsd-arm64 \
-	bin-openbsd-amd64 \
-	bin-openbsd-386 \
-	bin-openbsd-arm \
-	bin-openbsd-arm64 \
 	bin-darwin-amd64 \
 	bin-darwin-arm64 \
 	bin-windows-amd64 \
