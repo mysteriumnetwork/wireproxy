@@ -81,3 +81,11 @@ func (wgst *WGStack) Close() error {
 func (wgst *WGStack) DialContext(ctx context.Context, net, addr string) (net.Conn, error) {
 	return wgst.tnet.DialContext(ctx, net, addr)
 }
+
+func (wgst *WGStack) IpcGet() (string, error) {
+	return wgst.dev.IpcGet()
+}
+
+func (wgst *WGStack) IpcSet(uapiConf string) error {
+	return wgst.dev.IpcSet(uapiConf)
+}
