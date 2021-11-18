@@ -3,6 +3,8 @@ wireproxy
 
 PoC: Wireguard + gVisor userspace network stack + HTTP proxy = :heart:
 
+Implements HTTP proxy which forwards traffic through wireguard tunnel connection without creating any actual tunnel in the operating system or adjusting network routing in any way.
+
 Built on top of [dumbproxy](https://github.com/Snawoot/dumbproxy).
 
 ## Installation
@@ -35,6 +37,8 @@ Run application:
 ```
 wireproxy -tun-addr 172.21.123.4 -wgconf p.conf
 ```
+
+HTTP proxy will be available at port 8080.
 
 ## Authentication
 
